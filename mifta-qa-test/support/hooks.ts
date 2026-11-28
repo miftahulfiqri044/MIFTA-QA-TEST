@@ -1,5 +1,5 @@
 import { After, AfterAll, Before, BeforeAll, Status, setDefaultTimeout } from '@cucumber/cucumber';
-import { type Browser, chromium, firefox, webkit } from '@playwright/test';
+import { type Browser, chromium, firefox, selectors, webkit } from '@playwright/test';
 import * as allure from 'allure-js-commons';
 import dotenv from 'dotenv';
 import type { CustomWorld } from './world';
@@ -15,7 +15,11 @@ const browserName = (process.env.BROWSER || 'chromium') as keyof typeof launcher
 let browser: Browser;
 
 BeforeAll(async () => {
-  browser = await launchers[browserName].launch({ headless: process.env.HEADED !== 'true' });
+  selectors.setTestIdAttribute('data-test');
+  browser = await launchers[browserName].launch({
+    headless: process.env.HEADED !== 'true',
+    slowMo: Number(process.env.SLOWMO) || 0,
+  });
 });
 
 AfterAll(async () => {

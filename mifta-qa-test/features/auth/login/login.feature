@@ -1,18 +1,21 @@
-# language: id
-Fitur: Login
+Feature: Verifikasi Fitur Login (Authentication)
 
-  Skenario: Login berhasil dengan user standar
-    Diberikan pengguna berada di halaman login
-    Ketika pengguna login dengan username "standard_user" dan password "secret_sauce"
-    Maka pengguna diarahkan ke halaman produk
+  @TC-001 @positive
+  Scenario: Login berhasil menggunakan kredensial valid
+    Given pengguna berada di halaman login
+    When pengguna login dengan akun "valid"
+    Then pengguna diarahkan ke halaman produk
 
-  Skenario: Login gagal karena password salah
-    Diberikan pengguna berada di halaman login
-    Ketika pengguna login dengan username "standard_user" dan password "password-salah"
-    Maka muncul pesan error "Username and password do not match"
-    Dan pengguna tetap berada di halaman login
+  @TC-002 @negative
+  Scenario: Login gagal menggunakan akun yang terkunci
+    Given pengguna berada di halaman login
+    When pengguna login dengan akun "terkunci"
+    Then muncul pesan error "Sorry, this user has been locked out."
+    And pengguna tetap berada di halaman login
 
-  Skenario: Login gagal untuk user yang terkunci
-    Diberikan pengguna berada di halaman login
-    Ketika pengguna login dengan username "locked_out_user" dan password "secret_sauce"
-    Maka muncul pesan error "Sorry, this user has been locked out"
+  @TC-003 @negative
+  Scenario: Login gagal menggunakan password yang salah
+    Given pengguna berada di halaman login
+    When pengguna login dengan akun "password salah"
+    Then muncul pesan error "Username and password do not match any user in this service"
+    And pengguna tetap berada di halaman login
