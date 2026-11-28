@@ -1,27 +1,26 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 import dotenv from 'dotenv';
-import path from 'path';
+import { defineBddConfig } from 'playwright-bdd';
 
-dotenv.config({ path: path.resolve(import.meta.dirname, '.env'), quiet: true });
+dotenv.config({ quiet: true });
 
-const BASE_URL = process.env.BASE_URL || 'https://www.saucedemo.com';
+const testDir = defineBddConfig({
+  features: 'features/**/*.feature',
+  steps: ['support/fixtures.ts', 'step-definitions/**/*.ts'],
+});
 
 export default defineConfig({
-  testDir: './tests',
-  fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: [['list'], ['html', { open: 'never' }]],
-  use: {
-    baseURL: BASE_URL, // Memanggil page.goto('/') otomatis membuka https://www.saucedemo.com
-    trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
-  },
-  projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+  testDir,
+  reporter: [
+    ['list'],
+    ['html', { open: 'never' }],
+    ['allure-playwright', { resultsDir: 'allure-results' }],
   ],
+  use: {
+    baseURL: process.env.BASE_URL || 'https://www.saucedemo.com',
+    testIdAttribute: 'data-test',
+    trace: 'on',
+    screenshot: 'only-on-failure',
+    launchOptions: { slowMo: Number(process.env.SLOWMO) || 0 },
+  },
 });
